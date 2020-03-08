@@ -1,8 +1,8 @@
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 
@@ -15,7 +15,17 @@ public class helloRedis {
 
     @Before
     public void init(){
-        jedis = new Jedis(host,port);
+
+        //配置连接池 Redis POOL 基本配置信息
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        //最大连接数
+        poolConfig.setMaxTotal(5);
+        //最大空闲数
+        poolConfig.setMaxIdle(1);
+        //通过poolConfig创建连接池
+        JedisPool pool = new JedisPool(poolConfig,"192.168.0.105");
+        //通过Pool获得Jedis
+        jedis = pool.getResource();
         jedis.auth("123456");
     }
 
@@ -35,10 +45,10 @@ public class helloRedis {
         }
     }
 
-
-
     @After
     public void destroy(){
         jedis.close();
     }
+
+
 }
